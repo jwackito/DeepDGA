@@ -1,8 +1,6 @@
 import numpy as np
-
-from keras.preprocessing.text import Tokenizer
-from random import shuffle
-import json
+import pandas as pd
+import tldextract
 
 table = {
     '0': 0,
@@ -43,7 +41,7 @@ table = {
     'y': 35,
     'z': 36,
     '-': 37,
-    '_': 38
+#   '_': 38
 }
 
 suffixes = ['.com', '.net', '.biz', '.ru', '.org', '.co.uk', '.info', '.cc', '.ws', '.cn']
@@ -51,115 +49,37 @@ suffixes = ['.com', '.net', '.biz', '.ru', '.org', '.co.uk', '.info', '.cc', '.w
 pad_value = 40
 
 def text2seq(text):
-    s = []
-    for c in text:
-        s.append(table[c])
-    return s
+    return [table[c] for c in text]
 
 def pad_seq(s, max_len):
-    global pad_value
     if len(s) > max_len:
         return s[:max_len]
-    for i in range(len(s), max_len):
-        s.append(pad_value)
-    return s
-
-def suffix_in(domain):
-    global suffixes
-    for s in suffixes:
-        if s in domain:
-            return s
-    return None
-
-def remove_suffix(domain):
-    ret = suffix_in(domain)
-    if ret is not None:
-        return domain.replace(ret, '')
-    return None
-
-def load_data(val_number, max_len, filter=True):
-    global suffixes
-
-    with open('data/all_dga.txt', 'r') as fneg:
-        neg_raw_data = fneg.readlines()
-    with open('data/all_legit.txt', 'r') as fpos:
-        pos_raw_data = fpos.readlines()
-
-    x_data = []
-    all_data = {}
-
-    if filter == True:
-        for line in neg_raw_data:
-            x = line.split(' ')[0]
-            r = remove_suffix(x)
-            if r is not None:
-                x_data.append(r)
-                all_data[r] = 1
-        for line in pos_raw_data:
-            x = line.split(' ')[0]
-            r = remove_suffix(x)
-            if r is not None:
-                x_data.append(r)
-                all_data[r] = 0
     else:
-        for line in neg_raw_data:
-            x = line.split(' ')[0]
-            x_data.append(x)
-            all_data[x] = 1
-        for line in pos_raw_data:
-            x = line.split(' ')[0]
-            x_data.append(x)
-            all_data[x] = 0
+        return s + ([pad_value]*(max_len-len(s)))
 
+def remove_tld(domain):
+    return tldextract.extract(domain).domain
 
-    shuffle(x_data)
+def load_data(val_number, max_len, tld=True):
+    df_pos = pd.read_csv('data/all_dga.txt', names=['domain', 'label'])
+    df_neg = pd.read_csv('data/all_legit.txt', names=['domain', 'label'])
+    df_pos['target'] = 1
+    df_neg['target'] = 0
+    if tld:
+        df_pos['domain'] = df_pos.domain.apply(remove_tld)
+        df_neg['domain'] = df_neg.domain.apply(remove_tld)
 
-    x_train = []
-    x_test = []
-    y_train = []
-    y_test = []
+    all_data = pd.concat([df_pos, df_neg])
 
-    n = 0
-    for x in x_data:
-        m = pad_seq(text2seq(x), max_len)
-        if n < val_number:
-            x_test.append(m)
-            y_test.append(all_data[x])
-        else:
-            x_train.append(m)
-            y_train.append(all_data[x])
-        n += 1
+    all_data['feature'] = all_data.domain.apply(lambda x: pad_seq(text2seq(x), max_len))
 
-    return (x_train, y_train), (x_test, y_test)
+    idx = list(range(len(all_data)))
+    np.random.shuffle(idx)
 
-def test():
-    with open("x_train.json", 'r') as f:
-        d1 = json.load(f)
-    with open("x_test.json", 'r') as f:
-        d2 = json.load(f)
-    with open("y_train.json", 'r') as f:
-        d3 = json.load(f)
-    with open("y_test.json", 'r') as f:
-        d4 = json.load(f)
+    train = all_data.iloc[idx[:val_number]]
+    test = all_data.iloc[idx[val_number:]]
 
-    print(len(d1), len(d2), len(d3), len(d4))
-
-    l1 = len(d1[0])
-    for d in d1:
-        if len(d) == l1:
-            continue
-        else:
-            l1 = (l1, len(d))
-            break
-    l2 = len(d2[0])
-    for d in d2:
-        if len(d) == l2:
-            continue
-        else:
-            l2 = (l2, len(d))
-            break
-
-    print(l1, l2)
+    return (list(train.feature.values), list(train.target.values)), (list(test.feature.values), list(test.target.values))
 
 if __name__ == '__main__':
     print("dataset main")
