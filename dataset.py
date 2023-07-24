@@ -77,7 +77,7 @@ def load_data(val_number, max_len, tld=True):
     np.random.shuffle(idx)
 
     train = all_data.iloc[idx[:val_number]]
-    test = all_data.iloc[idx[val_number:]]
+    test = all_data.iloc[idx[val_number:val_number*2]]
 
     return (np.array(list(train.feature.values)), np.array(list(train.target.values))),(np.array(list(test.feature.values)), np.array(list(test.target.values)))
 

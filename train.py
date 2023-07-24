@@ -10,7 +10,7 @@ from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, LearningRateSche
 from models import basic_cnn_model, lstm_model, cnn_lstm_model, bidirectional_lstm_model
 from dataset import load_data
 
-maxlen = 40
+maxlen = 100
 batch_size = 256
 epochs = 150
 
@@ -39,7 +39,7 @@ def lr_schedule(epoch):
     return lr
 
 def build_callbacks(save_path, tflog_dir, batch_size):
-    checkpoint = ModelCheckpoint(filepath=save_path, monitor="val_acc", verbose=1, save_best_only=True, save_weights_only=True)
+    checkpoint = ModelCheckpoint(filepath=save_path, monitor="val_accuracy", verbose=1, save_best_only=True, save_weights_only=True)
     lr_reducer = ReduceLROnPlateau(factor=0.1,
                                 cooldown=0,
                                 patience=5,
