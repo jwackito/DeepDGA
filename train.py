@@ -50,7 +50,7 @@ def build_callbacks(save_path, tflog_dir, batch_size):
     return callbacks
 
 print('Loading data...')
-(x_train, y_train), (x_test, y_test) = load_data(200000, maxlen, filter=True)
+(x_train, y_train), (x_test, y_test) = load_data(200000, maxlen, tld=True)
 print(len(x_train), 'train sequences')
 print(len(x_test), 'test sequences')
 
