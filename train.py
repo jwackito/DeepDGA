@@ -10,9 +10,9 @@ from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, LearningRateSche
 from models import basic_cnn_model, lstm_model, cnn_lstm_model, bidirectional_lstm_model
 from dataset import load_data
 
-maxlen = 100
+maxlen = 40
 batch_size = 256
-epochs = 200
+epochs = 150
 
 log_path = 'logs'
 name = 'basic_cnn_lstm'

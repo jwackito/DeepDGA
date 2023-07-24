@@ -41,7 +41,7 @@ table = {
     'y': 35,
     'z': 36,
     '-': 37,
-#   '_': 38
+    '_': 38
 }
 
 suffixes = ['.com', '.net', '.biz', '.ru', '.org', '.co.uk', '.info', '.cc', '.ws', '.cn']
@@ -79,7 +79,7 @@ def load_data(val_number, max_len, tld=True):
     train = all_data.iloc[idx[:val_number]]
     test = all_data.iloc[idx[val_number:]]
 
-    return (list(train.feature.values), list(train.target.values)), (list(test.feature.values), list(test.target.values))
+    return (np.array(list(train.feature.values)), np.array(list(train.target.values))),(np.array(list(test.feature.values)), np.array(list(test.target.values)))
 
 if __name__ == '__main__':
     print("dataset main")
