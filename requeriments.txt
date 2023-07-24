@@ -1,5 +1,10 @@
-keras
-tensorflow
-tdlextract
-pandas
-numpy
+joblib==1.1.0
+keras==2.13.1
+matplotlib==3.5.2
+matplotlib-inline==0.1.3
+numpy==1.23.1
+pandas==1.4.3
+requests==2.31.0
+requests-file==1.5.1
+tensorflow==2.13.0
+tldextract==3.4.4
