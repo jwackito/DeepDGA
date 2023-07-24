@@ -1,6 +1,6 @@
 
 from keras.models import Sequential
-from keras.layers import Dense, Dropout, Embedding, LSTM, CuDNNLSTM, Bidirectional
+from keras.layers import Dense, Dropout, Embedding, LSTM, LSTM, Bidirectional
 from keras.layers import Activation, Conv1D, GlobalMaxPooling1D, MaxPooling1D
 
 max_features = 5000
